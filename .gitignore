@@ -1,0 +1,26 @@
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl
+
+# Ansible
+*.retry
+ansible/vault/*.yml
+!ansible/vault/.gitkeep
+
+# Secrets / env
+.env
+*.pem
+*.key
+secrets/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+__pycache__/
