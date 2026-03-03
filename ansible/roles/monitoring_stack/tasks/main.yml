@@ -1,0 +1,21 @@
+---
+# Déploiement de la stack supervision (Zabbix + Grafana + HAProxy)
+- name: Créer le répertoire de la stack
+  ansible.builtin.file:
+    path: /opt/monitoring
+    state: directory
+    mode: "0750"
+
+- name: Copier le docker-compose et les configs
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "0640"
+  loop:
+    - { src: "../../monitoring/docker-compose.yml", dest: "/opt/monitoring/docker-compose.yml" }
+    - { src: "../../monitoring/haproxy/haproxy.cfg", dest: "/opt/monitoring/haproxy/haproxy.cfg" }
+
+- name: Démarrer la stack
+  community.docker.docker_compose_v2:
+    project_src: /opt/monitoring
+    state: present

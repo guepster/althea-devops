@@ -1,0 +1,4 @@
+---
+timezone: Europe/Paris
+docker_users: [devops]
+# Les secrets sont chargés depuis ansible/vault/prod.yml (chiffré)

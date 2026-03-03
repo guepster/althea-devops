@@ -1,0 +1,1 @@
+# Vault chiffré via 'ansible-vault encrypt'. Ne jamais committer en clair.

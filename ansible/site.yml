@@ -1,0 +1,13 @@
+---
+# Playbook racine — applique l'ensemble des rôles aux hôtes DevOps
+- name: Base commune + durcissement
+  hosts: all
+  roles:
+    - common
+    - hardening
+    - docker
+
+- name: Stack de supervision
+  hosts: monitoring
+  roles:
+    - monitoring_stack

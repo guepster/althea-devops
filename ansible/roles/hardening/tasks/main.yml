@@ -1,0 +1,20 @@
+---
+# Durcissement CIS Level 1 + restrictions ANSSI (extrait)
+- name: Désactiver l'authentification SSH par mot de passe
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+  notify: restart sshd
+
+- name: Activer le pare-feu et n'autoriser que les ports nécessaires
+  ansible.builtin.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop: [22, 443, 1514, 1515]
+
+- name: Installer auditd
+  ansible.builtin.package:
+    name: auditd
+    state: present
