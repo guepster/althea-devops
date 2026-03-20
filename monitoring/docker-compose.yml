@@ -1,0 +1,69 @@
+# Stack supervision Althea — déployée par Ansible (rôle monitoring_stack)
+# Images versionnées (pas de tag :latest en production)
+services:
+  zabbix-db:
+    image: postgres:16.3-alpine
+    environment:
+      POSTGRES_DB: zabbix
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD_FILE: /run/secrets/zabbix_db_password
+    secrets: [zabbix_db_password]
+    volumes: ["zabbix-db-data:/var/lib/postgresql/data"]
+    networks: [supervision-back]
+
+  zabbix-server:
+    image: zabbix/zabbix-server-pgsql:7.0.0-ubuntu
+    environment:
+      DB_SERVER_HOST: zabbix-db
+      POSTGRES_USER: zabbix
+      POSTGRES_DB: zabbix
+      POSTGRES_PASSWORD_FILE: /run/secrets/zabbix_db_password
+    secrets: [zabbix_db_password]
+    ports: ["10051:10051"]
+    networks: [supervision-back, supervision-front]
+    depends_on: [zabbix-db]
+
+  grafana:
+    image: grafana/grafana-oss:10.4.2
+    environment:
+      GF_AUTH_PROXY_ENABLED: "true"            # SSO via oauth2-proxy
+      GF_AUTH_PROXY_HEADER_NAME: X-Auth-Email
+      GF_SECURITY_ADMIN_PASSWORD_FILE: /run/secrets/grafana_admin_password
+    secrets: [grafana_admin_password]
+    volumes: ["grafana-data:/var/lib/grafana"]
+    expose: ["3000"]
+    networks: [supervision-front]
+    depends_on: [zabbix-server]
+
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
+    environment:
+      OAUTH2_PROXY_PROVIDER: oidc
+      OAUTH2_PROXY_EMAIL_DOMAINS: "althea-systems.fr,aleeph.fr"
+      OAUTH2_PROXY_CLIENT_SECRET_FILE: /run/secrets/oauth_client_secret
+      OAUTH2_PROXY_COOKIE_SECRET_FILE: /run/secrets/oauth_cookie_secret
+    secrets: [oauth_client_secret, oauth_cookie_secret]
+    expose: ["4180"]
+    networks: [supervision-front]
+
+  haproxy:
+    image: haproxy:2.9.7-alpine
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    networks: [supervision-front]
+    depends_on: [oauth2-proxy, grafana, zabbix-server]
+
+networks:
+  supervision-back:  { driver: bridge, internal: true }
+  supervision-front: { driver: bridge }
+
+volumes:
+  zabbix-db-data: {}
+  grafana-data: {}
+
+secrets:
+  zabbix_db_password:    { file: ./secrets/zabbix_db_password }
+  grafana_admin_password:{ file: ./secrets/grafana_admin_password }
+  oauth_client_secret:   { file: ./secrets/oauth_client_secret }
+  oauth_cookie_secret:   { file: ./secrets/oauth_cookie_secret }
