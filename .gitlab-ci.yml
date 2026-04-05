@@ -1,0 +1,117 @@
+# Pipeline CI/CD de référence — Althea Systems
+# Inclus depuis tous les projets via :
+#   include:
+#     - project: 'devops/gitlab-ci-templates'
+#       ref: main
+#       file: '/iac-pipeline.yml'
+
+variables:
+  TERRAFORM_VERSION: "1.7.5"
+  ANSIBLE_VERSION: "2.16"
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+  AZURE_TENANT_ID: $AZURE_TENANT_ID          # variable protégée
+  AZURE_SUBSCRIPTION_ID: $AZURE_SUBSCRIPTION_ID
+
+stages:
+  - lint
+  - secret-scan
+  - sast
+  - sca
+  - build
+  - image-scan
+  - iac-scan
+  - test
+  - deploy-dev
+  - deploy-prod
+
+default:
+  image: registry.althea-systems.fr/devops/runner-base:1.4.0
+  before_script:
+    - terraform --version
+    - ansible --version
+
+# ---------- LINT ----------
+lint:terraform:
+  stage: lint
+  script:
+    - terraform fmt -check -recursive
+    - find . -name "*.tf" -exec terraform validate {} +
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+lint:ansible:
+  stage: lint
+  script:
+    - ansible-lint --strict --profile production
+    - yamllint -c .yamllint .
+
+# ---------- SECRET SCAN ----------
+secret-scan:gitleaks:
+  stage: secret-scan
+  image: zricethezav/gitleaks:v8.18.4
+  script:
+    - gitleaks detect --source . -v --redact
+  allow_failure: false      # bloquant
+
+# ---------- SAST ----------
+sast:sonarqube:
+  stage: sast
+  image: sonarsource/sonar-scanner-cli:5.0
+  variables:
+    SONAR_HOST_URL: "https://sonarqube.althea-systems.fr"
+    SONAR_TOKEN: $SONAR_TOKEN
+  script:
+    - sonar-scanner -Dsonar.projectKey=althea-iac -Dsonar.qualitygate.wait=true
+  allow_failure: false
+
+# ---------- SCA ----------
+sca:trivy-fs:
+  stage: sca
+  image:
+    name: aquasec/trivy:0.52.0
+    entrypoint: [""]
+  script:
+    - trivy fs --severity HIGH,CRITICAL --exit-code 1 --skip-dirs .terraform .
+
+# ---------- IAC SCAN ----------
+iac-scan:checkov:
+  stage: iac-scan
+  image: bridgecrew/checkov:3.2.250
+  script:
+    - checkov -d . --framework terraform --soft-fail-on LOW,MEDIUM
+
+iac-scan:tfsec:
+  stage: iac-scan
+  image: aquasec/tfsec:v1.28.6
+  script:
+    - tfsec . --minimum-severity HIGH
+
+# ---------- DEPLOY ----------
+.deploy: &deploy
+  before_script:
+    - mkdir -p ~/.ssh && echo "$ANSIBLE_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+    - chmod 600 ~/.ssh/id_ed25519
+
+deploy-dev:
+  <<: *deploy
+  stage: deploy-dev
+  environment: { name: dev }
+  script:
+    - cd terraform/envs/dev && terraform init && terraform apply -auto-approve
+    - cd ../../../ansible && ansible-playbook -i inventories/dev/hosts.yml site.yml
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+deploy-prod:
+  <<: *deploy
+  stage: deploy-prod
+  environment: { name: production }
+  script:
+    - cd terraform/envs/prod && terraform init && terraform plan -out plan.tfplan
+    - terraform apply plan.tfplan
+    - cd ../../../ansible && ansible-playbook -i inventories/prod/hosts.yml site.yml
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+$/
+      when: manual
+  resource_group: production

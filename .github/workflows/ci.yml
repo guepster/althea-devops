@@ -1,0 +1,13 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with: { terraform_version: 1.7.5 }
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
