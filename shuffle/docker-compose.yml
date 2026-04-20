@@ -1,0 +1,37 @@
+# Stack Shuffle (SOAR) déployée par le rôle Ansible shuffle sur MON-ALT-01
+version: '3.8'
+services:
+  frontend:
+    image: ghcr.io/shuffle/shuffle-frontend:1.4.2
+    container_name: shuffle-frontend
+    restart: unless-stopped
+    environment: { BACKEND_HOSTNAME: shuffle-backend }
+    ports: ["3443:443"]
+    depends_on: [backend]
+  backend:
+    image: ghcr.io/shuffle/shuffle-backend:1.4.2
+    container_name: shuffle-backend
+    restart: unless-stopped
+    environment:
+      DATASTORE_EMULATOR_HOST: shuffle-opensearch:9200
+      ORG_ID: althea
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+    depends_on: [opensearch]
+  orborus:
+    image: ghcr.io/shuffle/shuffle-orborus:1.4.2
+    container_name: shuffle-orborus
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT_NAME: onprem
+      BASE_URL: http://shuffle-backend:5001
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+  opensearch:
+    image: opensearchproject/opensearch:2.14.0
+    container_name: shuffle-opensearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - "OPENSEARCH_JAVA_OPTS=-Xms1024m -Xmx1024m"
+    volumes: ["shuffle-database:/usr/share/opensearch/data"]
+volumes:
+  shuffle-database: {}

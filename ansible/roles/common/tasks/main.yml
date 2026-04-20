@@ -1,0 +1,8 @@
+---
+# Base commune : timezone, NTP, paquets
+- name: "Common | Fuseau horaire"
+  community.general.timezone: { name: "{{ timezone | default('Europe/Paris') }}" }
+- name: "Common | Paquets de base"
+  ansible.builtin.package:
+    name: [chrony, curl, vim, htop, unzip]
+    state: present

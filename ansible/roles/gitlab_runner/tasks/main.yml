@@ -1,0 +1,5 @@
+---
+# Rôle gitlab_runner — déployé via Ansible (cf. DAT).
+# TODO: compléter les tâches (extrait non détaillé dans le DAT).
+- name: "gitlab_runner | placeholder"
+  ansible.builtin.debug: { msg: "role gitlab_runner" }

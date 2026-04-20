@@ -1,0 +1,35 @@
+# Mapping groupes Entra ID -> rôles Kubernetes (cf. DAT 4.4.2)
+# alt-aks-prod-developer : admin des namespaces applicatifs uniquement
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: namespace-admin
+  namespace: althea-saas-prod
+rules:
+  - apiGroups: ["", "apps", "batch", "networking.k8s.io"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: developers-namespace-admin
+  namespace: althea-saas-prod
+subjects:
+  - kind: Group
+    name: "<OBJECT_ID_alt-aks-prod-developer>" # Entra ID group object id
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: namespace-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+# alt-aks-deploy-bot (Workload Identity) : create/update deployments seulement
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: deploy
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "create", "update", "patch"]

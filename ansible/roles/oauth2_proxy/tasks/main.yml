@@ -1,0 +1,5 @@
+---
+# Rôle oauth2_proxy — déployé via Ansible (cf. DAT).
+# TODO: compléter les tâches (extrait non détaillé dans le DAT).
+- name: "oauth2_proxy | placeholder"
+  ansible.builtin.debug: { msg: "role oauth2_proxy" }

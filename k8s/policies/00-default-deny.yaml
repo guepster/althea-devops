@@ -1,0 +1,11 @@
+# Politique par défaut : deny-all sur le namespace applicatif
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: althea-saas-prod
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress

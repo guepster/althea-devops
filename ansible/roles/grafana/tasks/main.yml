@@ -1,0 +1,5 @@
+---
+# Rôle grafana — déployé via Ansible (cf. DAT).
+# TODO: compléter les tâches (extrait non détaillé dans le DAT).
+- name: "grafana | placeholder"
+  ansible.builtin.debug: { msg: "role grafana" }

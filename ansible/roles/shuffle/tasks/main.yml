@@ -1,0 +1,11 @@
+---
+# Déploiement de la stack SOAR Shuffle (conteneurs Docker)
+- name: "Shuffle | Créer le répertoire"
+  ansible.builtin.file: { path: /home/ansible/shuffle, state: directory, mode: "0750" }
+- name: "Shuffle | Copier le docker-compose"
+  ansible.builtin.copy:
+    src: ../../../shuffle/docker-compose.yml
+    dest: /home/ansible/shuffle/docker-compose.yml
+    mode: "0640"
+- name: "Shuffle | Démarrer la stack"
+  community.docker.docker_compose_v2: { project_src: /home/ansible/shuffle, state: present }

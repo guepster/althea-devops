@@ -1,0 +1,5 @@
+---
+# Rôle zabbix_server — déployé via Ansible (cf. DAT).
+# TODO: compléter les tâches (extrait non détaillé dans le DAT).
+- name: "zabbix_server | placeholder"
+  ansible.builtin.debug: { msg: "role zabbix_server" }

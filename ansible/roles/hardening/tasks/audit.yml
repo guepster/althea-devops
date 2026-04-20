@@ -1,0 +1,16 @@
+---
+- name: "Audit | Installer auditd"
+  ansible.builtin.package:
+    name: auditd
+    state: present
+
+- name: "Audit | Règles de surveillance des fichiers sensibles"
+  ansible.builtin.copy:
+    dest: /etc/audit/rules.d/althea.rules
+    mode: "0640"
+    content: |
+      -w /etc/passwd -p wa -k identity
+      -w /etc/shadow -p wa -k identity
+      -w /etc/sudoers -p wa -k privesc
+      -w /var/ossec/etc -p wa -k wazuh-conf
+  notify: restart auditd

@@ -1,0 +1,5 @@
+---
+# Rôle postgresql_client — déployé via Ansible (cf. DAT).
+# TODO: compléter les tâches (extrait non détaillé dans le DAT).
+- name: "postgresql_client | placeholder"
+  ansible.builtin.debug: { msg: "role postgresql_client" }

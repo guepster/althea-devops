@@ -1,0 +1,5 @@
+---
+# Rôle jump_host — déployé via Ansible (cf. DAT).
+# TODO: compléter les tâches (extrait non détaillé dans le DAT).
+- name: "jump_host | placeholder"
+  ansible.builtin.debug: { msg: "role jump_host" }

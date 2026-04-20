@@ -1,0 +1,23 @@
+---
+# Déploiement de l'agent Tanium sur les serveurs Linux Althea (idempotent)
+- name: "Tanium | Vérifier que l'agent n'est pas déjà installé"
+  ansible.builtin.stat:
+    path: /opt/Tanium/TaniumClient/TaniumClient
+  register: tanium_binary
+  tags: [tanium]
+
+- name: "Tanium | Récupérer le package depuis Azure Blob (signed)"
+  ansible.builtin.get_url:
+    url: "{{ tanium_pkg_url }}"
+    dest: /tmp/tanium-client.deb
+    checksum: "sha256:{{ tanium_pkg_sha256 }}"
+    mode: "0644"
+  when: not tanium_binary.stat.exists
+  tags: [tanium]
+
+- name: "Tanium | Installer le package"
+  ansible.builtin.apt:
+    deb: /tmp/tanium-client.deb
+    state: present
+  when: not tanium_binary.stat.exists
+  tags: [tanium]

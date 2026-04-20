@@ -1,0 +1,4 @@
+---
+# Bootstrap initial d'un nouvel hôte (clé SSH, python, common)
+- hosts: all
+  roles: [common]

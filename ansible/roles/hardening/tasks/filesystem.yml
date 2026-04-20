@@ -1,0 +1,8 @@
+---
+- name: "FS | Monter /tmp avec noexec, nosuid, nodev"
+  ansible.posix.mount:
+    path: /tmp
+    src: /dev/mapper/vg-tmp
+    fstype: ext4
+    opts: defaults,noexec,nosuid,nodev
+    state: mounted

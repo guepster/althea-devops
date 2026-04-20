@@ -1,0 +1,36 @@
+---
+# Déploiement du certificat racine Zscaler (inspection TLS) sur les hôtes Linux
+- name: "Zscaler CA | Copier le certificat racine dans le magasin système"
+  ansible.builtin.copy:
+    src: ZscalerRootCA.crt
+    dest: /usr/local/share/ca-certificates/ZscalerRootCA.crt
+    owner: root
+    group: root
+    mode: "0644"
+  notify: update ca certificates
+  tags: [zscaler]
+
+- name: "Zscaler CA | Déclarer le certificat pour le démon Docker"
+  ansible.builtin.copy:
+    src: ZscalerRootCA.crt
+    dest: /etc/docker/certs.d/registry.althea-systems.fr/ca.crt
+    owner: root
+    group: docker
+    mode: "0640"
+  notify: restart docker
+  tags: [zscaler, docker]
+
+- name: "Zscaler CA | Configurer le profil système (REQUESTS_CA_BUNDLE)"
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    line: "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt"
+    state: present
+  tags: [zscaler, env]
+
+- name: "Zscaler CA | Vérifier l'installation"
+  ansible.builtin.command: |
+    openssl s_client -connect github.com:443 -showcerts -servername github.com
+  register: ssl_check
+  changed_when: false
+  failed_when: "'Zscaler' not in ssl_check.stdout"
+  tags: [zscaler, verify]

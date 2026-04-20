@@ -1,0 +1,5 @@
+---
+# Rôle wazuh_manager — déployé via Ansible (cf. DAT).
+# TODO: compléter les tâches (extrait non détaillé dans le DAT).
+- name: "wazuh_manager | placeholder"
+  ansible.builtin.debug: { msg: "role wazuh_manager" }

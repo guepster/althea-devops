@@ -1,0 +1,5 @@
+---
+- hosts: siem
+  roles: [docker, wazuh_manager]
+- hosts: monitoring
+  roles: [shuffle]

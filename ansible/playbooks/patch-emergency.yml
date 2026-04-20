@@ -1,0 +1,6 @@
+---
+# Patching d'urgence CVE
+- hosts: all
+  tasks:
+    - name: "Mise à jour de sécurité"
+      ansible.builtin.apt: { upgrade: dist, update_cache: true }

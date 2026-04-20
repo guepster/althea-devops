@@ -1,5 +1,8 @@
 # Althea Systems — Plateforme DevOps (Aleeph)
 
+> 📎 **Dépôt du projet (accès correcteur / jury)** : https://github.com/<TON_PSEUDO>/althea-devops
+> _Remplacer `<TON_PSEUDO>` par votre identifiant GitHub après publication._
+
 Code source de la chaîne DevOps & Gouvernance déployée pour **Althea Systems**
 (périmètre Paris · Genève · Azure France Centre). Ce dépôt accompagne le
 Document d'Architecture Technique (DAT) et regroupe l'infrastructure-as-code,
@@ -69,9 +72,11 @@ le pipeline `.gitlab-ci.yml` (voir section CI/CD du DAT).
 ├── .gitlab-ci.yml          # Pipeline CI/CD de référence
 ├── terraform/              # Infrastructure Azure (modules + environnements)
 ├── ansible/                # Configuration des hôtes (rôles + playbooks)
+├── k8s/                    # NetworkPolicies, RBAC Entra ID, CronJob anonymisation
 ├── monitoring/             # Stack supervision (docker-compose + HAProxy)
+├── shuffle/                # Stack SOAR Shuffle (docker-compose)
 ├── siem/                   # Configuration Wazuh (ossec.conf)
-├── scripts/                # Outils (anonymisation HDS...)
+├── hds-anonymizer/         # Conteneur d'anonymisation k-anonymat + Dockerfile durci
 ├── runbooks/               # Procédures d'exploitation (PRA/PCA)
 └── docs/                   # Documentation / lien vers le DAT
 ```

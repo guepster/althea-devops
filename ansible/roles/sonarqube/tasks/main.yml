@@ -1,0 +1,5 @@
+---
+# Rôle sonarqube — déployé via Ansible (cf. DAT).
+# TODO: compléter les tâches (extrait non détaillé dans le DAT).
+- name: "sonarqube | placeholder"
+  ansible.builtin.debug: { msg: "role sonarqube" }
