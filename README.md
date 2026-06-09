@@ -1,7 +1,6 @@
-# Althea Systems — Plateforme DevOps (Aleeph)
+# Althea Systems : Plateforme DevOps (Aleeph)
 
-> 📎 **Dépôt du projet (accès correcteur / jury)** : https://github.com/<TON_PSEUDO>/althea-devops
-> _Remplacer `<TON_PSEUDO>` par votre identifiant GitHub après publication._
+> **Dépôt du projet (accès correcteur / jury)** : https://github.com/guepster/althea-devops
 
 Code source de la chaîne DevOps & Gouvernance déployée pour **Althea Systems**
 (périmètre Paris · Genève · Azure France Centre). Ce dépôt accompagne le
@@ -9,7 +8,7 @@ Document d'Architecture Technique (DAT) et regroupe l'infrastructure-as-code,
 les pipelines CI/CD, la stack de supervision et les procédures d'exploitation.
 
 > Contexte : refonte d'un SI hébergeant des données de santé (conformité
-> **HDS · RGPD · ANSSI · ISO 27001**). Auteur : Shems AIT ALI SLIMANE — DevOps.
+> **HDS · RGPD · ANSSI · ISO 27001**). Auteur : Shems AIT ALI SLIMANE au poste de DevOps.
 
 ---
 
@@ -89,4 +88,4 @@ le pipeline `.gitlab-ci.yml` (voir section CI/CD du DAT).
 
 ## Licence
 
-Projet pédagogique — Bachelor CPI, 2026. Données et identifiants fictifs.
+Projet pédagogique / Bachelor CPI, 2026
